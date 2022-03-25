@@ -7,8 +7,4 @@ class Index:
     def __call__(self, request):
         title = 'Главная'
 
-        context = {
-            title: title,
-        }
-
-        return '200 OK', render('index.html', context)
+        return '200 OK', render('index.html', title=title)
