@@ -1,6 +1,6 @@
 from datetime import date
 
-from views import Index
+from views import Index, Products, Contacts
 
 
 def copyright_year(request):
@@ -11,5 +11,7 @@ def copyright_year(request):
 fronts = [copyright_year]
 
 routes = {
-    '/': Index()
+    '/': Index(),
+    '/products/': Products(),
+    '/contacts/': Contacts()
 }

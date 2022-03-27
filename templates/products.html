@@ -363,25 +363,26 @@ table tr td
 <body>
   <div id="main">
     <div id="header">
-      <div id="logo">
-        <div id="logo_text">
-          <!-- class="logo_colour", allows you to change the colour of the text -->
-          <h1><a href="/">Интернет-магазин<span class="logo_colour">Хозтовары</span></a></h1>
+        <div id="logo">
+            <div id="logo_text">
+                <!-- class="logo_colour", allows you to change the colour of the text -->
+                <h1><a href="/">Интернет-магазин<span class="logo_colour">Хозтовары</span></a></h1>
+            </div>
         </div>
-      </div>
-      <div id="menubar">
-        <ul id="menu">
-          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-          <li><a href="/">Главная</a></li>
-          <li><a href="products">Товары</a></li>
-          <li class="selected"><a href="contacts">Контакты</a></li>
-        </ul>
-      </div>
+        <div id="menubar">
+            <ul id="menu">
+                <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+                <li><a href="/">Главная</a></li>
+                <li class="selected"><a href="products">Товары</a></li>
+                <li><a href="contacts">Контакты</a></li>
+            </ul>
+        </div>
     </div>
     <div id="content_header"></div>
     <div id="site_content">
-      <div id="sidebar_container">
-        <div class="sidebar">
+        <div id="banner"></div>
+        <div id="sidebar_container">
+            <div class="sidebar">
                 <div class="sidebar_top"></div>
                 <div class="sidebar_item">
                     <!-- insert your sidebar items here -->
@@ -420,23 +421,27 @@ table tr td
                 </div>
                 <div class="sidebar_base"></div>
             </div>
-      </div>
-      <div id="content">
-        <!-- insert the page content here -->
-        <h1>Форма обратной связи</h1>
-          <div class="form_settings">
-            <p><span>Имя</span><input class="contact" type="text" name="your_name" value="" /></p>
-            <p><span>Email</span><input class="contact" type="text" name="your_email" value="" /></p>
-            <p><span>Сообщение</span><textarea class="contact textarea" rows="8" cols="50" name="your_enquiry"></textarea></p>
-            <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" name="contact_submitted" value="Отправить" /></p>
-          </div>
-      </div>
+        </div>
+        <div id="content">
+            <!-- insert the page content here -->
+            <h1>Продукты интенет-магазина "Хозтовары</h1>
+            <ul class="goods-list">
+                {% for product in product_list %}
+                    <li class="goods-item">
+                        <h3>{{ product.name }}</h3>
+                        <img src="{{ product.img }}" alt="Товар {{ product.name }}">
+                        <p>{{ product.desc }}</p>
+                        <p>Цена: {{ product.price }} руб.</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
     <div id="content_footer"></div>
     <div id="footer">
-      <p><a href="/">Главная</a> | <a href="products">Товары</a> | <a href="contacts">Контакты</a></p>
+        <p><a href="/">Главная</a> | <a href="products">Товары</a> | <a href="contacts">Контакты</a></p>
         <p>Copyright &copy; {{ year }} </p>
     </div>
-  </div>
+</div>
 </body>
 </html>

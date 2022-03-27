@@ -1,13 +1,16 @@
 """Главный модуль фреймворка"""
 
+
 class PageNotFound404:
     """Класс-описывает обработку запроса к несуществующей странице"""
+
     def __call__(self, request):
         return '404 WHAT', 'Page not found'
 
 
 class FrameworkApp:
     """Класс-основа фреймворка"""
+
     def __init__(self, routes, fronts):
         self.routes = routes
         self.fronts = fronts

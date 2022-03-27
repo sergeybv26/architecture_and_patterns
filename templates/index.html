@@ -106,11 +106,11 @@ ol li
   margin-right: auto;}
 
 #header
-{ background: #323534 url(back.png) repeat-x;
+{ background: #323534 url(/style/back.png) repeat-x;
   height: 177px;}
 
 #banner
-{  background: transparent url(banner.jpg) no-repeat;
+{  background: transparent url(/style/banner.jpg) no-repeat;
   width: 860px;
   height: 180px;
   margin-bottom: 20px;
@@ -163,7 +163,7 @@ ul#menu li
   padding: 0 0 0 9px;
   list-style: none;
   margin: 1px 2px 0 0;
-  background: #5A5A5A url(tab.png) no-repeat 0 0;}
+  background: #5A5A5A url(/style/tab.png) no-repeat 0 0;}
 
 ul#menu li a
 { font: normal 100% 'trebuchet ms', sans-serif;
@@ -174,7 +174,7 @@ ul#menu li a
   text-align: center;
   color: #FFF;
   text-decoration: none;
-  background: #5A5A5A url(tab.png) no-repeat 100% 0;}
+  background: #5A5A5A url(/style/tab.png) no-repeat 100% 0;}
 
 ul#menu li.selected a
 { height: 20px;
@@ -182,10 +182,10 @@ ul#menu li.selected a
 
 ul#menu li.selected
 { margin: 1px 2px 0 0;
-  background: #00C6F0 url(tab_selected.png) no-repeat 0 0;}
+  background: #00C6F0 url(/style/tab_selected.png) no-repeat 0 0;}
 
 ul#menu li.selected a, ul#menu li.selected a:hover
-{ background: #00C6F0 url(tab_selected.png) no-repeat 100% 0;
+{ background: #00C6F0 url(/style/tab_selected.png) no-repeat 100% 0;
   color: #FFF;}
 
 ul#menu li a:hover
@@ -204,12 +204,12 @@ ul#menu li a:hover
 .sidebar_top
 { width: 222px;
   height: 14px;
-  background: transparent url(side_top.png) no-repeat;}
+  background: transparent url(/style/side_top.png) no-repeat;}
 
 .sidebar_base
 { width: 222px;
   height: 14px;
-  background: url(side_base.png) no-repeat;}
+  background: url(/style/side_base.png) no-repeat;}
 
 .sidebar
 { float: right;
@@ -218,7 +218,7 @@ ul#menu li a:hover
   margin: 0 0 16px 0;}
 
 .sidebar_item
-{ background: url(side_back.png) repeat-y;
+{ background: url(/style/side_back.png) repeat-y;
   padding: 0 15px;
   width: 192px;}
 
@@ -239,7 +239,7 @@ ul#menu li a:hover
 
 #content ul li, .sidebar ul li
 { list-style-type: none;
-  background: url(bullet.png) no-repeat;
+  background: url(/style/bullet.png) no-repeat;
   margin: 0 0 0 0;
   padding: 0 0 4px 25px;
   line-height: 1.5em;}
@@ -251,7 +251,7 @@ ul#menu li a:hover
   height: 80px;
   padding: 28px 0 5px 0;
   text-align: center;
-  background: #3B3939 url(footer.png) repeat-x;
+  background: #3B3939 url(/style/footer.png) repeat-x;
   color: #A8AA94;}
 
 #footer p
@@ -338,6 +338,25 @@ table tr td
   color: #47433F;
   border-top: 1px solid #FFF;}
 
+.goods-list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	padding-top: 64px;
+	padding-bottom: 64px;
+}
+
+.goods-item {
+	width: 359px;
+    padding: 44px 32px;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    box-shadow: 5px 20px 50px rgba(16, 112, 177, 0.2);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
     </style>
 </head>
 
@@ -347,13 +366,13 @@ table tr td
         <div id="logo">
             <div id="logo_text">
                 <!-- class="logo_colour", allows you to change the colour of the text -->
-                <h1><a href="">Интернет-магазин<span class="logo_colour">Хозтовары</span></a></h1>
+                <h1><a href="/">Интернет-магазин<span class="logo_colour">Хозтовары</span></a></h1>
             </div>
         </div>
         <div id="menubar">
             <ul id="menu">
                 <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-                <li class="selected"><a href="">Главная</a></li>
+                <li class="selected"><a href="/">Главная</a></li>
                 <li><a href="products">Товары</a></li>
                 <li><a href="contacts">Контакты</a></li>
             </ul>
@@ -406,28 +425,23 @@ table tr td
         <div id="content">
             <!-- insert the page content here -->
             <h1>Добро пожаловать в интенет-магазин "Хозтовары"</h1>
-            <p>This standards compliant, simple, fixed width website template is released as an 'open source' design
-                (under a <a href="http://creativecommons.org/licenses/by/3.0">Creative Commons Attribution 3.0
-                    Licence</a>), which means that you are free to download and use it for anything you want (including
-                modifying and amending it). All I ask is that you leave the 'design from HTML5webtemplates.co.uk' link
-                in the footer of the template, but other than that...</p>
-            <p>This template is written entirely in <strong>HTML5</strong> and <strong>CSS</strong>, and can be
-                validated using the links in the footer.</p>
-            <p>You can view more free HTML5 web templates <a href="http://www.html5webtemplates.co.uk">here</a>.</p>
-            <p>This template is a fully functional 5 page website, with an <a href="examples.html">examples</a> page
-                that gives examples of all the styles available with this design.</p>
-            <h2>Горячее предложение</h2>
-            <p>This template has been tested in the following browsers:</p>
-            <ul>
-                <li>Internet Explorer 9</li>
-                <li>FireFox 25</li>
-                <li>Google Chrome 31</li>
+            <p><strong>Хозтовары</strong> - интернет-гипермаркет товаров для дома и дачи, туризма и отдыха, инструмента, детских товаров</p>
+            <h2>Популярные товары</h2>
+            <ul class="goods-list">
+                {% for product in product_list %}
+                    <li class="goods-item">
+                        <h3>{{ product.name }}</h3>
+                        <img src="{{ product.img }}" alt="Товар {{ product.name }}">
+                        <p>{{ product.desc }}</p>
+                        <p>Цена: {{ product.price }} руб.</p>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
     </div>
     <div id="content_footer"></div>
     <div id="footer">
-        <p><a href="">Главная</a> | <a href="products">Товары</a> | <a href="contacts">Контакты</a></p>
+        <p><a href="/">Главная</a> | <a href="products">Товары</a> | <a href="contacts">Контакты</a></p>
         <p>Copyright &copy; {{ year }} </p>
     </div>
 </div>
