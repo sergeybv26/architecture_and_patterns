@@ -27,6 +27,7 @@ class FrameworkApp:
         request = {}
         method = environ['REQUEST_METHOD']
         request['method'] = method
+        request['path'] = path
 
         if method == 'POST':
             data = PostRequest().get_request_params(environ)

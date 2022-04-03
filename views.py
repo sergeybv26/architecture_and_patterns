@@ -59,6 +59,7 @@ class Index:
         context = {
             'title': title,
             'year': request.get('year'),
+            'path': request.get('path'),
             'product_list': get_main_product()
         }
 
@@ -73,6 +74,7 @@ class Products:
         context = {
             'title': title,
             'year': request.get('year'),
+            'path': request.get('path'),
             'product_list': PRODUCTS
         }
 
@@ -86,6 +88,7 @@ class Contacts:
 
         context = {
             'title': title,
+            'path': request.get('path'),
             'year': request.get('year')
         }
 
