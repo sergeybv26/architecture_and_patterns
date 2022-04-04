@@ -19,6 +19,8 @@ class Index:
             'product_list': ENGINE.get_main_products()
         }
 
+        LOGGER.log(f'Сформирована главная страница с контекстом: {context}')
+
         return '200 OK', render('index.html', context=context)
 
 
@@ -66,6 +68,9 @@ class CreateCategory:
             new_category = ENGINE.create_category(name, category)
 
             ENGINE.categories.append(new_category)
+
+            LOGGER.log(f'Создана категория {name}')
+
             return '302 Found', [('Location', '/')]
         else:
             return '200 OK', render('create_category.html', context=context)
@@ -88,9 +93,9 @@ class CreateProduct:
 
         if request['method'] == 'POST':
             data = request['data']
-            try:
-                category_id = data['category_id']
-            except KeyError:
+
+            category_id = data['category_id']
+            if not category_id.isdigit():
                 context['error'] = 'Необходимо выбрать категорию'
                 return '200 OK', render('create_product.html', context=context)
             product_type = data['product_type']
@@ -100,6 +105,9 @@ class CreateProduct:
             category = ENGINE.get_category_by_id(int(category_id))
             product = ENGINE.create_product(product_type, name, category, price)
             ENGINE.products.append(product)
+
+            LOGGER.log(f'Создан продукт {name}')
+
             return '302 Found', [('Location', f'/products/category/?id={category_id}')]
         else:
             return '200 OK', render('create_product.html', context=context)
