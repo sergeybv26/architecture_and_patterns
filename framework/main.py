@@ -27,6 +27,7 @@ class FrameworkApp:
         request = {}
         method = environ['REQUEST_METHOD']
         request['method'] = method
+        request['path'] = path
 
         if method == 'POST':
             data = PostRequest().get_request_params(environ)
@@ -46,7 +47,9 @@ class FrameworkApp:
             front(request)
 
         code, body = view(request)
-
+        if code == '302 Found':
+            start_response(code, body)
+            return []
         start_response(code, [('Content-Type', 'text/html')])
 
         return [body.encode('utf-8')]

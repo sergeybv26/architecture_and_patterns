@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block style %}
+    {% include "inc-style.html" %}
+{% endblock %}
+
+{% block header %}
+    {% include "inc-main-menu.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "inc-sidebar.html" %}
+{% endblock %}
+{% block content %}
+    <!-- insert the page content here -->
+    <h1>Создание категории</h1>
+    <form action="" method="post">
+        <div class="form_settings">
+            <fieldset>
+                <p><span>Родительская категория</span><select name="category_id" required>
+                    <option>Выберите категорию</option>
+                    {% for category in category_list %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                </p>
+                <p><b>{{ error }}</b></p>
+                <p><span>Тип товара</span></p>
+                <p><input type="radio" name="product_type" value="product" checked/>Продукт</p>
+                <p><input type="radio" name="product_type" value="service"/>Услуга</p>
+
+                <p><span>Название товара</span><input class="contact" type="text" name="name" value="" required/></p>
+                <p><span>Цена товара</span><input class="contact" type="text" name="price" value="" required/></p>
+            </fieldset>
+            <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" value="Сохранить"/></p>
+        </div>
+    </form>
+{% endblock %}
