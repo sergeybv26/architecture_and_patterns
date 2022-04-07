@@ -1,4 +1,5 @@
 from quopri import decodestring
+from time import time
 
 
 class AbstractUser:
@@ -232,3 +233,31 @@ class Logger(metaclass=SingletonByName):
     @staticmethod
     def log(text):
         print('log--->', text)
+
+
+class AppRoute:
+    """Паттерн-декоратор, создающий маршруты для представлений"""
+    def __init__(self, routes, url):
+        self.routes = routes
+        self.url = url
+
+    def __call__(self, cls):
+        self.routes[self.url] = cls()
+
+
+class AppTime:
+    """паттерн-декоратор, осуществляет подсчет и вывод времени работы методов декорируемого класса"""
+    def __init__(self, name):
+        self.name = name
+
+    def __call__(self, cls):
+        def timeit(method):
+            def timed(*args, **kwargs):
+                start_time = time()
+                result = method(*args, **kwargs)
+                end_time = time()
+                time_delta = end_time - start_time
+                print(f'debug -->> {self.name} выполнялся {time_delta:2.2f} мс')
+                return result
+            return timed
+        return timeit(cls)

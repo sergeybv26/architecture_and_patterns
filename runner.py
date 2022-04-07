@@ -1,7 +1,9 @@
 from wsgiref.simple_server import make_server
 
+
 from framework.main import FrameworkApp
-from urls import routes, fronts
+from urls import fronts
+from views import routes
 
 if __name__ == '__main__':
     application = FrameworkApp(routes, fronts)
