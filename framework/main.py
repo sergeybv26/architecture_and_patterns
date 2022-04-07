@@ -47,7 +47,9 @@ class FrameworkApp:
             front(request)
 
         code, body = view(request)
-
+        if code == '302 Found':
+            start_response(code, body)
+            return []
         start_response(code, [('Content-Type', 'text/html')])
 
         return [body.encode('utf-8')]
