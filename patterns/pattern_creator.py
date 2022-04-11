@@ -1,12 +1,21 @@
 from quopri import decodestring
 from time import time
 
+from jsonpickle import dumps, loads
+
 
 class AbstractUser:
     """Класс абстрактного пользователя"""
     def __init__(self, name, password):
         self.name = name
         self.password = password
+        self.is_login = False
+
+    def login(self):
+        self.is_login = True
+
+    def logout(self):
+        self.is_login = False
 
 
 class Buyer(AbstractUser):
@@ -82,6 +91,19 @@ class Category:
         self.img = ''
 
 
+class Basket:
+    """Класс корзины"""
+    def __init__(self, user):
+        self.user = user
+        self.product_list = []
+
+    def add_to_basket(self, product):
+        self.product_list.append(product)
+
+    def remove_from_basket(self, product):
+        self.product_list.remove(product)
+
+
 class Engine:
     """Основной класс"""
     def __init__(self):
@@ -89,6 +111,7 @@ class Engine:
         self.staff = []
         self.products = []
         self.categories = []
+        self.baskets = []
 
     @staticmethod
     def create_user(user_type, name, password):
@@ -191,6 +214,24 @@ class Engine:
                 return category.products
         return []
 
+    def create_basket(self, user):
+        """
+        Создает корзину пользователя
+        :param user: пользователь
+        :return: экземпляр класса корзины пользователя
+        """
+        for basket in self.baskets:
+            if basket.user == user:
+                return basket
+        return Basket(user)
+
+    def get_basket(self, user):
+        """Получает корзину пользователя"""
+        for basket in self.baskets:
+            if basket.user == user:
+                return basket
+        return None
+
     @staticmethod
     def decode_value(val):
         """
@@ -261,3 +302,16 @@ class AppTime:
                 return result
             return timed
         return timeit(cls)
+
+
+class ProductsSerializer:
+    """класс паттерн-хранитель, осуществляющий сериализацию базы товаров"""
+    def __init__(self, obj):
+        self.obj = obj
+
+    def save(self):
+        return dumps(self.obj)
+
+    @staticmethod
+    def load(data):
+        return loads(data)
