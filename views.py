@@ -1,6 +1,6 @@
 """Описание представлений"""
 from framework.templator import render
-from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime
+from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime, ProductsSerializer
 
 ENGINE = Engine()
 LOGGER = Logger('main')
@@ -162,5 +162,25 @@ class Contacts:
             'path': request.get('path'),
             'year': request.get('year')
         }
+
+        return '200 OK', render('contact.html', context=context)
+
+
+@AppRoute(routes=routes, url='/products/category/load/')
+class LoadData:
+    """Заполняет базу из файла json"""
+    def __call__(self, request):
+        title = 'Загрузка данных'
+
+        with open('json/category.json', 'r', encoding='utf-8') as f:
+            data = ProductsSerializer([]).load(f.read())
+
+        context = {
+            'title': title,
+            'path': request.get('path'),
+            'year': request.get('year'),
+            'data': data
+        }
+        print(data)
 
         return '200 OK', render('contact.html', context=context)
