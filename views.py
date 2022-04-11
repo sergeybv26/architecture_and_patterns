@@ -1,14 +1,18 @@
 """Описание представлений"""
 from framework.templator import render
-from patterns.pattern_creator import Engine, Logger
+from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime
 
 ENGINE = Engine()
 LOGGER = Logger('main')
 
+routes = {}
 
+
+@AppRoute(routes=routes, url='/')
 class Index:
     """Представление главной страницы"""
 
+    @AppTime('Index')
     def __call__(self, request):
         title = 'Главная'
 
@@ -24,9 +28,11 @@ class Index:
         return '200 OK', render('index.html', context=context)
 
 
+@AppRoute(routes=routes, url='/products/')
 class Products:
     """Представление страницы с продуктами"""
 
+    @AppTime('Products')
     def __call__(self, request):
         title = 'Продукты'
 
@@ -41,9 +47,11 @@ class Products:
         return '200 OK', render('products.html', context=context)
 
 
+@AppRoute(routes=routes, url='/products/create-category/')
 class CreateCategory:
     """Представление страницы создания категории"""
 
+    @AppTime('Create_category')
     def __call__(self, request):
         title = 'Создание категории'
 
@@ -76,10 +84,12 @@ class CreateCategory:
             return '200 OK', render('create_category.html', context=context)
 
 
+@AppRoute(routes=routes, url='/products/create-product/')
 class CreateProduct:
     """Представление страницы создания продукта"""
     category_id = - 1
 
+    @AppTime('Create_product')
     def __call__(self, request):
         title = 'Создание категории'
 
@@ -113,10 +123,12 @@ class CreateProduct:
             return '200 OK', render('create_product.html', context=context)
 
 
+@AppRoute(routes=routes, url='/products/category/')
 class ProductsList:
     """Представление страницы товаров для категории"""
     category_id = -1
 
+    @AppTime('Products_list')
     def __call__(self, request):
         self.category_id = request['request_params']['id']
         if self.category_id != -1:
@@ -137,9 +149,11 @@ class ProductsList:
         return '200 OK', render('products.html', context=context)
 
 
+@AppRoute(routes=routes, url='/contacts/')
 class Contacts:
     """Представление страницы контактов"""
 
+    @AppTime('Contacts')
     def __call__(self, request):
         title = 'Контакты'
 
