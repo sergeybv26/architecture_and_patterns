@@ -1,7 +1,10 @@
+from abc import ABCMeta, abstractmethod
 from quopri import decodestring
 from time import time
 
 from jsonpickle import dumps, loads
+
+from framework.templator import render
 
 
 class AbstractUser:
@@ -102,6 +105,30 @@ class Basket:
 
     def remove_from_basket(self, product):
         self.product_list.remove(product)
+
+    def get_product_list(self):
+        return self.product_list
+
+    def get_user(self):
+        return self.user
+
+
+class Order:
+    """Класс заказа"""
+    def __init__(self, basket):
+        self.user = basket.get_user()
+        self.product_list = basket.get_product_list()
+
+    def get_total_price(self):
+        total_price = 0
+        for item in self.product_list:
+            total_price += item.price
+
+        return total_price
+
+    def pay(self, pay_method):
+        total = self.get_total_price()
+        pay_method.pay(total)
 
 
 class Engine:
@@ -268,12 +295,13 @@ class SingletonByName(type):
 
 class Logger(metaclass=SingletonByName):
     """Класс логгера"""
-    def __init__(self, name):
+    def __init__(self, name, writer_type='file'):
         self.name = name
+        self.writer = WriterFabric().get_writer(writer_type)
 
-    @staticmethod
-    def log(text):
-        print('log--->', text)
+    def log(self, text):
+        text = f'log---> {text}'
+        self.writer.write(text)
 
 
 class AppRoute:
@@ -315,3 +343,115 @@ class ProductsSerializer:
     @staticmethod
     def load(data):
         return loads(data)
+
+
+class TemplateView:
+    """Поведенческий паттерн. Шаблонный метод"""
+    template_name = 'template.html'
+    redirect_url = '/'
+
+    def get_context_data(self):
+        return {}
+
+    def get_template(self):
+        return self.template_name
+
+    def get_redirect_url(self):
+        return self.redirect_url
+
+    def render_template(self):
+        template_name = self.get_template()
+        context = self.get_context_data()
+        return '200 OK', render(template_name, context)
+
+    def success_redirect(self):
+        url = self.get_redirect_url()
+        return '302 Found', [('Location', url)]
+
+    def __call__(self, request):
+        return self.render_template()
+
+
+class ListView(TemplateView):
+    queryset = []
+    template_name = 'list.html'
+    context_object_name = 'objects_list'
+
+    def get_queryset(self):
+        return self.queryset
+
+    def get_context_object_name(self):
+        return self.context_object_name
+
+    def get_context_data(self):
+        queryset = self.get_queryset()
+        context_object_name = self.get_context_object_name()
+        context = {context_object_name: queryset}
+        return context
+
+
+class CreateView(TemplateView):
+    template_name = 'create.html'
+
+    @staticmethod
+    def get_request_data(request):
+        return request['data']
+
+    def create_obj(self, data):
+        pass
+
+    def __call__(self, request):
+        if request['method'] == 'POST':
+            data = self.get_request_data(request)
+            self.create_obj(data)
+
+            return self.success_redirect()
+        else:
+            return super().__call__(request)
+
+
+class ConsoleWriter:
+    def write(self, text):
+        print(text)
+
+
+class FileWriter:
+    def __init__(self, filename='log.txt'):
+        self.filename = filename
+
+    def write(self, text):
+        with open(self.filename, 'a', encoding='utf-8') as f:
+            f.write(f'{text}\n')
+
+
+class WriterFabric:
+    @staticmethod
+    def get_writer(writer_type):
+        if writer_type == 'file':
+            return FileWriter()
+        elif writer_type == 'console':
+            return ConsoleWriter()
+
+
+class Payment(metaclass=ABCMeta):
+    """Абстрактный класс. Паттерн-стратегия процесса оплаты"""
+    @abstractmethod
+    def pay(self, amount):
+        pass
+
+
+class PayPalPayment(Payment):
+    def __init__(self, email, token):
+        self.email = email
+        self.token = token
+
+    def pay(self, amount):
+        print(f'Выполнена оплата на сумму {amount} через PayPal аккаунт {self.email}')
+
+
+class CardPayment(Payment):
+    def __init__(self, card_num):
+        self.card = card_num
+
+    def pay(self, amount):
+        print(f'Выполнена оплата на сумму {amount} с карты № {self.card}')

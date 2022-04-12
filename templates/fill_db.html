@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block style %}
+    {% include "inc-style.html" %}
+{% endblock %}
+
+{% block header %}
+    {% include "inc-main-menu.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "inc-sidebar.html" %}
+{% endblock %}
+{% block content %}
+    <!-- insert the page content here -->
+    <h1>Заполнение базы данных из файла</h1>
+    <form action="" method="post">
+        <div class="form_settings">
+            <fieldset>
+                <p><span>Тип данных</span></p>
+                <p><input type="checkbox" name="data_category" value="1" checked/>Категории</p>
+                <p><input type="checkbox" name="data_product" value="1"/>Продукты</p>
+            </fieldset>
+            <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" value="Заполнить"/></p>
+        </div>
+    </form>
+{% endblock %}

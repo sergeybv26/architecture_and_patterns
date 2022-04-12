@@ -1,9 +1,11 @@
 """Описание представлений"""
+from datetime import date
+
 from framework.templator import render
-from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime, ProductsSerializer
+from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime, ProductsSerializer, CreateView
 
 ENGINE = Engine()
-LOGGER = Logger('main')
+LOGGER = Logger('main', 'file')
 
 routes = {}
 
@@ -166,21 +168,39 @@ class Contacts:
         return '200 OK', render('contact.html', context=context)
 
 
-@AppRoute(routes=routes, url='/products/category/load/')
-class LoadData:
+@AppRoute(routes=routes, url='/products/load/')
+class LoadData(CreateView):
     """Заполняет базу из файла json"""
-    def __call__(self, request):
-        title = 'Загрузка данных'
+    template_name = 'fill_db.html'
+    redirect_url = '/products/'
 
-        with open('json/category.json', 'r', encoding='utf-8') as f:
-            data = ProductsSerializer([]).load(f.read())
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['title'] = 'Загрузка данных'
+        context['year'] = date.today().year
 
-        context = {
-            'title': title,
-            'path': request.get('path'),
-            'year': request.get('year'),
-            'data': data
-        }
-        print(data)
+        return context
 
-        return '200 OK', render('contact.html', context=context)
+    def create_obj(self, data: dict):
+        if data['data_category']:
+            with open('json/category.json', 'r', encoding='utf-8') as f:
+                load_data = ProductsSerializer([]).load(f.read())
+            if load_data:
+                for item in load_data:
+                    new_category = ENGINE.create_category(item['name'])
+                    ENGINE.categories.append(new_category)
+                    LOGGER.log(f"Создана категория {item['name']}")
+        if data['data_product']:
+            with open('json/products.json', 'r', encoding='utf-8') as f:
+                load_data = ProductsSerializer([]).load(f.read())
+            if load_data:
+                for item in load_data:
+                    category = ENGINE.get_category_by_name(item['category'])
+                    name = item['name']
+                    price = item['price']
+                    product_type = item['product_type']
+
+                    new_product = ENGINE.create_product(product_type, name, category, price)
+                    ENGINE.products.append(new_product)
+
+                    LOGGER.log(f"Создан продукт {name}")
