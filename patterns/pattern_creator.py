@@ -432,9 +432,6 @@ class ProductsSerializer:
         return loads(data)
 
 
-LOGGER = Logger('patterns', 'file')
-
-
 class TemplateView:
     """Поведенческий паттерн. Шаблонный метод"""
     template_name = 'template.html'
@@ -452,7 +449,6 @@ class TemplateView:
     def render_template(self):
         template_name = self.get_template()
         context = self.get_context_data()
-        LOGGER.log(f'Сформирована страница с контекстом: {context}')
         return '200 OK', render(template_name, context)
 
     def success_redirect(self):
@@ -544,6 +540,3 @@ class CardPayment(Payment):
 
     def pay(self, amount):
         print(f'Выполнена оплата на сумму {amount} с карты № {self.card}')
-
-
-

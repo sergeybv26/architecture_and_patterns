@@ -309,11 +309,14 @@ class Logout:
 @AppRoute(routes=routes, url='/basket/')
 class BasketList(ListView):
     """Отображение корзины"""
-    # basket = ENGINE.get_basket(variables.AUTH_USER)
-    try:
-        queryset = ENGINE.get_basket(variables.AUTH_USER).get_product_list()
-    except Exception as err:
-        print(err)
+    def get_queryset(self):
+        basket = ENGINE.get_basket(variables.AUTH_USER)
+        if basket:
+            queryset = basket.get_product_list()
+        else:
+            queryset = []
+        return queryset
+
     template_name = 'basket.html'
 
 
@@ -321,7 +324,7 @@ class BasketList(ListView):
 class Order:
     """Создание заказа"""
     def __call__(self, request):
-        user = request['request_params']['user']
+        user = request.get('user')
         basket = ENGINE.get_basket(user)
         if not basket:
             return '302 Found', [('Location', f'/')]
@@ -337,7 +340,7 @@ class Order:
             'year': request.get('year'),
             'user': user,
             'total': order.get_total_price(),
-            'order': order
+            'order': order.id
         }
 
         if request['method'] == 'POST':
@@ -354,3 +357,10 @@ class Order:
             return '302 Found', [('Location', '/')]
         else:
             return '200 OK', render('order.html', context=context)
+
+
+@AppRoute(routes=routes, url='/api/products/')
+class ProductsApi:
+    @AppTime('ProductsAPI')
+    def __call__(self, request):
+        return '200 OK', ProductsSerializer(ENGINE.products).save()

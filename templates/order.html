@@ -10,8 +10,8 @@
 {% include "inc-sidebar.html" %}
 {% endblock %}
 {% block content %}
-<h1>Заказ № { order.id }</h1>
-<h3>Сумма заказа: { total }</h3>
+<h1>Заказ № {{ order }}</h1>
+<h3>Сумма заказа: {{ total }}</h3>
 <form action="" method="post">
     <div class="form_settings">
         <fieldset>
