@@ -11,6 +11,20 @@
             <li {% if path == "/" %}class="selected"{% endif %}><a href="/">Главная</a></li>
             <li {% if path == "/products/" %}class="selected"{% endif %}><a href="/products">Товары</a></li>
             <li {% if path == "/contacts/" %}class="selected"{% endif %}><a href="/contacts">Контакты</a></li>
+            <li {% if path == "/create_user/" %}class="selected"{% endif %}><a href="/create_user">Создать пользователя</a></li>
+            <li>{% if user == "Анонимный" %}
+                <a href="/login">Войти</a>
+                {% else %}
+                <a href="/logout">Выйти</a>
+                {% endif %}
+            </li>
+            <li>{% if user != "Анонимный" %}
+                <a href="/basket">Корзина</a>
+                {% endif %}
+            </li>
         </ul>
+
+
     </div>
+    <p>Пользователь: {{ user }}</p>
 </div>

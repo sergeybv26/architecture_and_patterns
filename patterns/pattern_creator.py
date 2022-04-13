@@ -5,6 +5,39 @@ from time import time
 from jsonpickle import dumps, loads
 
 from framework.templator import render
+import variables
+
+
+class Observer(metaclass=ABCMeta):
+    """Поведенческий паттерн-наблюдатель"""
+    @abstractmethod
+    def update(self, subject):
+        pass
+
+
+class Subject:
+    def __init__(self):
+        self.observers = set()
+
+    def attach(self, observer):
+        self.observers.add(observer)
+
+    def detach(self, observer):
+        self.observers.discard(observer)
+
+    def notify(self):
+        for item in self.observers:
+            item.update(self)
+
+
+class SmsOrderNotifier(Observer):
+    def update(self, subject):
+        print(f'SMS ---> Создан и оплачен заказ на сумму {subject.get_total_price()}')
+
+
+class EmailOrderNotifier(Observer):
+    def update(self, subject):
+        print(f'E-mail ---> Создан и оплачен заказ на сумму {subject.get_total_price()}')
 
 
 class AbstractUser:
@@ -16,9 +49,11 @@ class AbstractUser:
 
     def login(self):
         self.is_login = True
+        variables.AUTH_USER = self.name
 
     def logout(self):
         self.is_login = False
+        variables.AUTH_USER = 'Анонимный'
 
 
 class Buyer(AbstractUser):
@@ -113,11 +148,16 @@ class Basket:
         return self.user
 
 
-class Order:
+class Order(Subject):
     """Класс заказа"""
+    id_count = 0
+
     def __init__(self, basket):
+        self.id = Order.id_count
+        Order.id_count += 1
         self.user = basket.get_user()
         self.product_list = basket.get_product_list()
+        super().__init__()
 
     def get_total_price(self):
         total_price = 0
@@ -129,6 +169,7 @@ class Order:
     def pay(self, pay_method):
         total = self.get_total_price()
         pay_method.pay(total)
+        self.notify()
 
 
 class Engine:
@@ -139,6 +180,7 @@ class Engine:
         self.products = []
         self.categories = []
         self.baskets = []
+        self.orders = []
 
     @staticmethod
     def create_user(user_type, name, password):
@@ -149,7 +191,18 @@ class Engine:
         :param password: пароль
         :return: экземпляр класса пользователя соответствующего типа
         """
-        return UserFactory.create(user_type, name, password)
+        new_user = UserFactory.create(user_type, name, password)
+        new_user.login()
+        return new_user
+
+    def get_user_by_name(self, name):
+        for user in self.buyers:
+            if user.name == name:
+                return user
+        for user in self.staff:
+            if user.name == name:
+                return user
+        raise Exception(f'Не найден пользователь с именем {name}')
 
     @staticmethod
     def create_category(name, category=None):
@@ -250,7 +303,9 @@ class Engine:
         for basket in self.baskets:
             if basket.user == user:
                 return basket
-        return Basket(user)
+        basket = Basket(user)
+        self.baskets.append(basket)
+        return basket
 
     def get_basket(self, user):
         """Получает корзину пользователя"""
@@ -258,6 +313,15 @@ class Engine:
             if basket.user == user:
                 return basket
         return None
+
+    @staticmethod
+    def create_order(basket):
+        """
+        Создает заказ
+        :param basket: Экземпляр класса корзины
+        :return: Экземпляр класса заказа
+        """
+        return Order(basket)
 
     @staticmethod
     def decode_value(val):
@@ -291,6 +355,29 @@ class SingletonByName(type):
         else:
             cls.__instance[name] = super().__call__(*args, **kwargs)
             return cls.__instance[name]
+
+
+class ConsoleWriter:
+    def write(self, text):
+        print(text)
+
+
+class FileWriter:
+    def __init__(self, filename='log.txt'):
+        self.filename = filename
+
+    def write(self, text):
+        with open(self.filename, 'a', encoding='utf-8') as f:
+            f.write(f'{text}\n')
+
+
+class WriterFabric:
+    @staticmethod
+    def get_writer(writer_type):
+        if writer_type == 'file':
+            return FileWriter()
+        elif writer_type == 'console':
+            return ConsoleWriter()
 
 
 class Logger(metaclass=SingletonByName):
@@ -345,13 +432,16 @@ class ProductsSerializer:
         return loads(data)
 
 
+LOGGER = Logger('patterns', 'file')
+
+
 class TemplateView:
     """Поведенческий паттерн. Шаблонный метод"""
     template_name = 'template.html'
     redirect_url = '/'
 
     def get_context_data(self):
-        return {}
+        return {'user': self.request.get('user')}
 
     def get_template(self):
         return self.template_name
@@ -362,6 +452,7 @@ class TemplateView:
     def render_template(self):
         template_name = self.get_template()
         context = self.get_context_data()
+        LOGGER.log(f'Сформирована страница с контекстом: {context}')
         return '200 OK', render(template_name, context)
 
     def success_redirect(self):
@@ -369,6 +460,7 @@ class TemplateView:
         return '302 Found', [('Location', url)]
 
     def __call__(self, request):
+        self.request = request
         return self.render_template()
 
 
@@ -386,7 +478,8 @@ class ListView(TemplateView):
     def get_context_data(self):
         queryset = self.get_queryset()
         context_object_name = self.get_context_object_name()
-        context = {context_object_name: queryset}
+        context = super().get_context_data()
+        context[context_object_name] = queryset
         return context
 
 
@@ -410,27 +503,23 @@ class CreateView(TemplateView):
             return super().__call__(request)
 
 
-class ConsoleWriter:
-    def write(self, text):
-        print(text)
+class DetailView(TemplateView):
+    item = None
+    template_name = 'detail.html'
+    context_object_name = 'item'
 
+    def get_item(self):
+        return self.item
 
-class FileWriter:
-    def __init__(self, filename='log.txt'):
-        self.filename = filename
+    def get_context_object_name(self):
+        return self.context_object_name
 
-    def write(self, text):
-        with open(self.filename, 'a', encoding='utf-8') as f:
-            f.write(f'{text}\n')
+    def get_context_data(self):
+        item = self.get_item()
+        context_object_name = self.get_context_object_name()
+        context = {context_object_name: item}
 
-
-class WriterFabric:
-    @staticmethod
-    def get_writer(writer_type):
-        if writer_type == 'file':
-            return FileWriter()
-        elif writer_type == 'console':
-            return ConsoleWriter()
+        return context
 
 
 class Payment(metaclass=ABCMeta):
@@ -455,3 +544,6 @@ class CardPayment(Payment):
 
     def pay(self, amount):
         print(f'Выполнена оплата на сумму {amount} с карты № {self.card}')
+
+
+

@@ -1,0 +1,11 @@
+<ul class="goods-list">
+    {% for product in product_list %}
+    <li class="goods-item">
+        <h3>{{ product.name }}</h3>
+        <img src="{{ product.img }}" alt="Товар {{ product.name }}">
+        <p>{{ product.desc }}</p>
+        <p>Цена: {{ product.price }} руб.</p>
+        <a href="/product/buy/?id={{ product.id }}&path={{ path }}">Купить</a>
+    </li>
+    {% endfor %}
+</ul>

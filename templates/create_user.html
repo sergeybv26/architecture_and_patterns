@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block style %}
+    {% include "inc-style.html" %}
+{% endblock %}
+
+{% block header %}
+    {% include "inc-main-menu.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "inc-sidebar.html" %}
+{% endblock %}
+{% block content %}
+    <!-- insert the page content here -->
+    <h1>Создание пользователя</h1>
+    <form action="" method="post">
+        <div class="form_settings">
+            <fieldset>
+                <p><span>Тип пользователя</span></p>
+                <p><input type="radio" name="user_type" value="buyer" checked/>Покупатель</p>
+                <p><input type="radio" name="user_type" value="staff"/>Персонал</p>
+
+                <p><span>Имя пользователя</span><input class="contact" type="text" name="name" value="" required/></p>
+                <p><span>Пароль</span><input class="contact" type="text" name="password" value="" required/></p>
+            </fieldset>
+            <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" value="Сохранить"/></p>
+        </div>
+    </form>
+{% endblock %}
