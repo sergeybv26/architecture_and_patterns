@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block style %}
+{% include "inc-style.html" %}
+{% endblock %}
+
+{% block header %}
+{% include "inc-main-menu.html" %}
+{% endblock %}
+{% block sidebar %}
+{% include "inc-sidebar.html" %}
+{% endblock %}
+{% block content %}
+<h1>Заказ № {{ order }}</h1>
+<h3>Сумма заказа: {{ total }}</h3>
+<form action="" method="post">
+    <div class="form_settings">
+        <fieldset>
+            <p><span>Способ оплаты</span></p>
+            <p><input type="radio" name="pay_method" value="paypal" checked/>PayPall</p>
+            <p><input type="radio" name="pay_method" value="card"/>Кредитная карта</p>
+        </fieldset>
+        <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" value="Оплатить"/></p>
+    </div>
+</form>
+{% endblock %}

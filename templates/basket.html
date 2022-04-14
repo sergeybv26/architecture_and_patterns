@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block style %}
+{% include "inc-style.html" %}
+{% endblock %}
+
+{% block header %}
+{% include "inc-main-menu.html" %}
+{% endblock %}
+{% block sidebar %}
+{% include "inc-sidebar.html" %}
+{% endblock %}
+{% block content %}
+<ul class="goods-list">
+    {% for product in objects_list %}
+    <li class="goods-item">
+        <h3>{{ product.name }}</h3>
+        <img src="{{ product.img }}" alt="Товар {{ product.name }}">
+        <p>{{ product.desc }}</p>
+        <p>Цена: {{ product.price }} руб.</p>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="/create_order/?user={{ user }}">Создать заказ</a>
+{% endblock %}

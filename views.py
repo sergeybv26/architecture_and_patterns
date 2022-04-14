@@ -1,9 +1,15 @@
 """Описание представлений"""
+from datetime import date
+
+import variables
 from framework.templator import render
-from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime
+from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime, ProductsSerializer, CreateView, ListView, \
+    EmailOrderNotifier, SmsOrderNotifier, PayPalPayment, CardPayment
 
 ENGINE = Engine()
-LOGGER = Logger('main')
+LOGGER = Logger('main', 'file')
+EMAIL_NOTIFIER = EmailOrderNotifier()
+SMS_NOTIFIER = SmsOrderNotifier()
 
 routes = {}
 
@@ -20,6 +26,7 @@ class Index:
             'title': title,
             'year': request.get('year'),
             'path': request.get('path'),
+            'user': request.get('user'),
             'product_list': ENGINE.get_main_products()
         }
 
@@ -40,6 +47,7 @@ class Products:
             'title': title,
             'year': request.get('year'),
             'path': request.get('path'),
+            'user': request.get('user'),
             'product_list': ENGINE.get_all_products(),
             'category_list': ENGINE.get_all_categories()
         }
@@ -59,6 +67,7 @@ class CreateCategory:
             'title': title,
             'year': request.get('year'),
             'path': request.get('path'),
+            'user': request.get('user'),
             'product_list': ENGINE.get_all_products(),
             'category_list': ENGINE.get_all_categories()
         }
@@ -97,6 +106,7 @@ class CreateProduct:
             'title': title,
             'year': request.get('year'),
             'path': request.get('path'),
+            'user': request.get('user'),
             'category_list': ENGINE.get_all_categories(),
             'error': ''
         }
@@ -142,6 +152,7 @@ class ProductsList:
             'title': title,
             'year': request.get('year'),
             'path': request.get('path'),
+            'user': request.get('user'),
             'product_list': products_list,
             'category_list': ENGINE.get_all_categories()
         }
@@ -160,7 +171,196 @@ class Contacts:
         context = {
             'title': title,
             'path': request.get('path'),
-            'year': request.get('year')
+            'year': request.get('year'),
+            'user': request.get('user')
         }
 
         return '200 OK', render('contact.html', context=context)
+
+
+@AppRoute(routes=routes, url='/products/load/')
+class LoadData(CreateView):
+    """Заполняет базу из файла json"""
+    template_name = 'fill_db.html'
+    redirect_url = '/products/'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['title'] = 'Загрузка данных'
+        context['year'] = date.today().year
+
+        return context
+
+    def create_obj(self, data: dict):
+        if data['data_category']:
+            with open('json/category.json', 'r', encoding='utf-8') as f:
+                load_data = ProductsSerializer([]).load(f.read())
+            if load_data:
+                for item in load_data:
+                    new_category = ENGINE.create_category(item['name'])
+                    ENGINE.categories.append(new_category)
+                    LOGGER.log(f"Создана категория {item['name']}")
+        if data['data_product']:
+            with open('json/products.json', 'r', encoding='utf-8') as f:
+                load_data = ProductsSerializer([]).load(f.read())
+            if load_data:
+                for item in load_data:
+                    category = ENGINE.get_category_by_name(item['category'])
+                    name = item['name']
+                    price = item['price']
+                    product_type = item['product_type']
+
+                    new_product = ENGINE.create_product(product_type, name, category, price)
+                    ENGINE.products.append(new_product)
+
+                    LOGGER.log(f"Создан продукт {name}")
+
+
+@AppRoute(routes=routes, url='/create_user/')
+class CreateUser(CreateView):
+    """Создание пользователя"""
+    template_name = 'create_user.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['title'] = 'Создание пользователя'
+        context['year'] = self.request.get('year')
+        context['path'] = self.request.get('path')
+
+        return context
+
+    def create_obj(self, data: dict):
+        user_type = data['user_type']
+        name = data['name']
+        password = data['password']
+        user = ENGINE.create_user(user_type, name, password)
+        if user_type == 'buyer':
+            ENGINE.buyers.append(user)
+        else:
+            ENGINE.staff.append(user)
+
+        LOGGER.log(f'Создан пользователь {name}')
+
+
+@AppRoute(routes=routes, url='/product/buy/')
+class BuyProduct:
+    """Добавление товара в корзину и создание корзины, если ее нет"""
+    product_id = -1
+    path = '/'
+
+    def __call__(self, request):
+        self.product_id = request['request_params']['id']
+        self.path = request['request_params']['path']
+        self.user = request.get('user')
+
+        if self.product_id != -1:
+            if self.user == 'Анонимный':
+                return '302 Found', [('Location', f'/login/')]
+            basket = ENGINE.create_basket(self.user)
+            product = ENGINE.get_product_by_id(int(self.product_id))
+            basket.add_to_basket(product)
+            return '302 Found', [('Location', f'{self.path}')]
+
+
+@AppRoute(routes=routes, url='/login/')
+class Login(CreateView):
+    """Авторизация пользователя"""
+    template_name = 'login.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['title'] = 'Вход'
+        context['year'] = self.request.get('year')
+        context['path'] = self.request.get('path')
+
+        return context
+
+    def create_obj(self, data):
+        name = data['name']
+        password = data['password']
+        try:
+            user = ENGINE.get_user_by_name(name)
+        except Exception as err:
+            print(err)
+        else:
+            if user.password == password:
+                user.login()
+            else:
+                print('Ошибка авторизации. Не верный пароль')
+
+
+@AppRoute(routes=routes, url='/logout/')
+class Logout:
+    """Выход пользователя"""
+    path = '/'
+
+    def __call__(self, request):
+        name = request.get('user')
+        try:
+            user = ENGINE.get_user_by_name(name)
+        except Exception as err:
+            print(err)
+        else:
+            user.logout()
+
+        return '302 Found', [('Location', f'{self.path}')]
+
+
+@AppRoute(routes=routes, url='/basket/')
+class BasketList(ListView):
+    """Отображение корзины"""
+    def get_queryset(self):
+        basket = ENGINE.get_basket(variables.AUTH_USER)
+        if basket:
+            queryset = basket.get_product_list()
+        else:
+            queryset = []
+        return queryset
+
+    template_name = 'basket.html'
+
+
+@AppRoute(routes=routes, url='/create_order/')
+class Order:
+    """Создание заказа"""
+    def __call__(self, request):
+        user = request.get('user')
+        basket = ENGINE.get_basket(user)
+        if not basket:
+            return '302 Found', [('Location', f'/')]
+        order = ENGINE.create_order(basket)
+        order.attach(EMAIL_NOTIFIER)
+        order.attach(SMS_NOTIFIER)
+        ENGINE.orders.append(order)
+
+        title = 'Заказ'
+
+        context = {
+            'title': title,
+            'year': request.get('year'),
+            'user': user,
+            'total': order.get_total_price(),
+            'order': order.id
+        }
+
+        if request['method'] == 'POST':
+            data = request['data']
+            pay_method = data['pay_method']
+
+            if pay_method == 'paypal':
+                pay_method = PayPalPayment('example@mail.ru', 'example_token')
+            elif pay_method == 'card':
+                pay_method = CardPayment('1234-1234-1234-1234')
+
+            order.pay(pay_method)
+
+            return '302 Found', [('Location', '/')]
+        else:
+            return '200 OK', render('order.html', context=context)
+
+
+@AppRoute(routes=routes, url='/api/products/')
+class ProductsApi:
+    @AppTime('ProductsAPI')
+    def __call__(self, request):
+        return '200 OK', ProductsSerializer(ENGINE.products).save()

@@ -16,18 +16,10 @@
             <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
             <li><a href="/products/create-category">Добавить категорию</a></li>
             <li><a href="/products/create-product">Добавить товар</a></li>
+            <li><a href="/products/load">Заполнить БД из файла</a></li>
         </ul>
     </div>
     <h1>Продукты интенет-магазина "Хозтовары</h1>
     {% include "inc-category-menu.html" %}
-    <ul class="goods-list">
-        {% for product in product_list %}
-            <li class="goods-item">
-                <h3>{{ product.name }}</h3>
-                <img src="{{ product.img }}" alt="Товар {{ product.name }}">
-                <p>{{ product.desc }}</p>
-                <p>Цена: {{ product.price }} руб.</p>
-            </li>
-        {% endfor %}
-    </ul>
+    {% include "inc-products-list.html" %}
 {% endblock %}

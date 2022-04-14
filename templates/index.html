@@ -15,14 +15,5 @@
     <p><strong>Хозтовары</strong> - интернет-гипермаркет товаров для дома и дачи, туризма и отдыха, инструмента, детских
         товаров</p>
     <h2>Популярные товары</h2>
-    <ul class="goods-list">
-        {% for product in product_list %}
-            <li class="goods-item">
-                <h3>{{ product.name }}</h3>
-                <img src="{{ product.img }}" alt="Товар {{ product.name }}">
-                <p>{{ product.desc }}</p>
-                <p>Цена: {{ product.price }} руб.</p>
-            </li>
-        {% endfor %}
-    </ul>
+    {% include "inc-products-list.html" %}
 {% endblock %}
