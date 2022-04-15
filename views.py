@@ -3,8 +3,9 @@ from datetime import date
 
 import variables
 from framework.templator import render
+from patterns.architect_pattern import UnitOfWork
 from patterns.pattern_creator import Engine, Logger, AppRoute, AppTime, ProductsSerializer, CreateView, ListView, \
-    EmailOrderNotifier, SmsOrderNotifier, PayPalPayment, CardPayment
+    EmailOrderNotifier, SmsOrderNotifier, PayPalPayment, CardPayment, MapperRegistry
 
 ENGINE = Engine()
 LOGGER = Logger('main', 'file')
@@ -12,6 +13,8 @@ EMAIL_NOTIFIER = EmailOrderNotifier()
 SMS_NOTIFIER = SmsOrderNotifier()
 
 routes = {}
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
 
 
 @AppRoute(routes=routes, url='/')
@@ -27,7 +30,7 @@ class Index:
             'year': request.get('year'),
             'path': request.get('path'),
             'user': request.get('user'),
-            'product_list': ENGINE.get_main_products()
+            'product_list': MapperRegistry.get_current_mapper('products').all()[-3:]
         }
 
         LOGGER.log(f'Сформирована главная страница с контекстом: {context}')
@@ -48,7 +51,7 @@ class Products:
             'year': request.get('year'),
             'path': request.get('path'),
             'user': request.get('user'),
-            'product_list': ENGINE.get_all_products(),
+            'product_list': MapperRegistry.get_current_mapper('products').all(),
             'category_list': ENGINE.get_all_categories()
         }
 
@@ -122,9 +125,10 @@ class CreateProduct:
             name = data['name']
             price = data['price']
 
-            category = ENGINE.get_category_by_id(int(category_id))
-            product = ENGINE.create_product(product_type, name, category, price)
-            ENGINE.products.append(product)
+            # category = ENGINE.get_category_by_id(int(category_id))
+            product = ENGINE.create_product(product_type, name, int(category_id), price)
+            MapperRegistry.get_current_mapper('products').insert(product)
+            # ENGINE.products.append(product)
 
             LOGGER.log(f'Создан продукт {name}')
 
@@ -142,7 +146,7 @@ class ProductsList:
     def __call__(self, request):
         self.category_id = request['request_params']['id']
         if self.category_id != -1:
-            products_list = ENGINE.get_products_by_category(int(self.category_id))
+            products_list = MapperRegistry.get_current_mapper('products').find_by_category(int(self.category_id))
         else:
             products_list = []
 
@@ -210,8 +214,9 @@ class LoadData(CreateView):
                     price = item['price']
                     product_type = item['product_type']
 
-                    new_product = ENGINE.create_product(product_type, name, category, price)
-                    ENGINE.products.append(new_product)
+                    new_product = ENGINE.create_product(product_type, name, int(category.id), price)
+                    MapperRegistry.get_current_mapper('products').insert(new_product)
+                    # ENGINE.products.append(new_product)
 
                     LOGGER.log(f"Создан продукт {name}")
 
@@ -257,7 +262,7 @@ class BuyProduct:
             if self.user == 'Анонимный':
                 return '302 Found', [('Location', f'/login/')]
             basket = ENGINE.create_basket(self.user)
-            product = ENGINE.get_product_by_id(int(self.product_id))
+            product = MapperRegistry.get_current_mapper('products').find_by_id(int(self.product_id))
             basket.add_to_basket(product)
             return '302 Found', [('Location', f'{self.path}')]
 

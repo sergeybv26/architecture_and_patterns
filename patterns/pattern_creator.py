@@ -1,11 +1,16 @@
 from abc import ABCMeta, abstractmethod
 from quopri import decodestring
+from sqlite3 import connect
 from time import time
 
 from jsonpickle import dumps, loads
 
+from errors import RecordNotFoundException, DbCommitException, DbUpdateException
 from framework.templator import render
 import variables
+from patterns.architect_pattern import DomainObject
+
+connection = connect('store.sqlite')
 
 
 class Observer(metaclass=ABCMeta):
@@ -80,27 +85,32 @@ class UserFactory:
 
 class Product:
     """Класс абстрактного продукта"""
-    id_count = 0
+    # id_count = 0
 
-    def __init__(self, name, category, price):
-        self.id = Product.id_count
-        Product.id_count += 1
+    def __init__(self, name, category_id, price):
+        self.id = None
+        # Product.id_count += 1
         self.name = name
-        self.category = category
+        self.category_id = category_id
         self.price = price
-        self.category.products.append(self)
+        # self.category.products.append(self)
         self.desc = ''
         self.img = ''
 
 
-class RealProduct(Product):
+class RealProduct(Product, DomainObject):
     """Класс товара"""
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.product_type = 'product'
 
 
-class ServiceProduct(Product):
+class ServiceProduct(Product, DomainObject):
     """Класс услуги"""
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.product_type = 'service'
 
 
 class ProductFactory:
@@ -540,3 +550,85 @@ class CardPayment(Payment):
 
     def pay(self, amount):
         print(f'Выполнена оплата на сумму {amount} с карты № {self.card}')
+
+
+class ProductsMapper:
+    def __init__(self, _connection):
+        self.connection = _connection
+        self.cursor = _connection.cursor()
+        self.tablename = 'product'
+
+    def all(self):
+        statement = f'SELECT * from {self.tablename}'
+        self.cursor.execute(statement)
+        result = []
+        for item in self.cursor.fetchall():
+            _id, product_type, name, category_id, price, desc, img = item
+            product = ProductFactory().create(product_type, name, category_id, price)
+            product.id = _id
+            product.desc = desc
+            product.img = img
+            result.append(product)
+        return result
+
+    def find_by_id(self, _id):
+        statement = f'SELECT * FROM {self.tablename} WHERE id=?'
+        self.cursor.execute(statement, (_id,))
+        result = self.cursor.fetchone()
+        if result:
+            _id, product_type, name, category_id, price, desc, img = result
+            product = ProductFactory().create(product_type, name, category_id, price)
+            product.id = _id
+            product.desc = desc
+            product.img = img
+            return product
+        else:
+            raise RecordNotFoundException(f'Запись с id = {_id} не найдена')
+
+    def find_by_category(self, category_id):
+        statement = f'SELECT * FROM {self.tablename} WHERE category_id=?'
+        self.cursor.execute(statement, (category_id,))
+        result = []
+        for item in self.cursor.fetchall():
+            _id, product_type, name, category_id, price, desc, img = item
+            product = ProductFactory().create(product_type, name, category_id, price)
+            product.id = _id
+            product.desc = desc
+            product.img = img
+            result.append(product)
+        return result
+
+    def insert(self, obj):
+        statement = f'INSERT INTO {self.tablename} (product_type, name, category_id, price, desc, img) VALUES (?)'
+        self.cursor.execute(statement, (obj.product_type, obj.name, obj.category_id, obj.price, obj.desc, obj.img))
+        try:
+            self.connection.commit()
+        except Exception as err:
+            raise DbCommitException(err.args)
+
+    def update(self, obj):
+        statement = f"UPDATE {self.tablename} SET name=?, category_id=?, price=?, desc=?, img=? WHERE id=?"
+        self.cursor.execute(statement, (obj.name, obj.category_id, obj.price, obj.desc, obj.img, obj.id))
+        try:
+            self.connection.commit()
+        except Exception as err:
+            raise DbUpdateException(err.args)
+
+    def delete(self, obj):
+        statement = f'DELETE FROM {self.tablename} WHERE id=?'
+        self.cursor.execute(statement, (obj.id,))
+
+
+class MapperRegistry:
+    mappers = {
+        'products': ProductsMapper,
+    }
+
+    @staticmethod
+    def get_mapper(obj):
+        if isinstance(obj, RealProduct) or isinstance(obj, ServiceProduct):
+            return ProductsMapper(connection)
+
+    @staticmethod
+    def get_current_mapper(name):
+        return MapperRegistry.mappers[name](connection)
