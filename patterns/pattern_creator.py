@@ -127,14 +127,14 @@ class ProductFactory:
 
 class Category:
     """Класс категории"""
-    id_count = 0
+    # id_count = 0
 
     def __init__(self, name, category):
-        self.id = Category.id_count
-        Category.id_count += 1
+        self.id = None
+        # Category.id_count += 1
         self.name = name
-        self.category = category
-        self.products = []
+        self.category_id = category
+        # self.products = []
         self.desc = ''
         self.img = ''
 
@@ -172,7 +172,7 @@ class Order(Subject):
     def get_total_price(self):
         total_price = 0
         for item in self.product_list:
-            total_price += item.price
+            total_price += int(item.price)
 
         return total_price
 
@@ -599,7 +599,8 @@ class ProductsMapper:
         return result
 
     def insert(self, obj):
-        statement = f'INSERT INTO {self.tablename} (product_type, name, category_id, price, desc, img) VALUES (?)'
+        statement = f'INSERT INTO {self.tablename} (product_type, name, category_id, price, desc, img) ' \
+                    f'VALUES (?, ?, ?, ?, ?, ?)'
         self.cursor.execute(statement, (obj.product_type, obj.name, obj.category_id, obj.price, obj.desc, obj.img))
         try:
             self.connection.commit()
@@ -619,9 +620,79 @@ class ProductsMapper:
         self.cursor.execute(statement, (obj.id,))
 
 
+class CategoryMapper:
+    def __init__(self, _connection):
+        self.connection = _connection
+        self.cursor = _connection.cursor()
+        self.tablename = 'category'
+
+    def all(self):
+        statement = f'SELECT * from {self.tablename}'
+        self.cursor.execute(statement)
+        result = []
+        for item in self.cursor.fetchall():
+            _id, name, category_id, desc, img = item
+            category = Category(name, category_id)
+            category.id = _id
+            category.desc = desc
+            category.img = img
+            result.append(category)
+        return result
+
+    def find_by_id(self, _id):
+        statement = f'SELECT * FROM {self.tablename} WHERE id=?'
+        self.cursor.execute(statement, (_id,))
+        result = self.cursor.fetchone()
+        if result:
+            _id, name, category_id, desc, img = result
+            category = Category(name, category_id)
+            category.id = _id
+            category.desc = desc
+            category.img = img
+            return category
+        else:
+            raise RecordNotFoundException(f'Запись с id = {_id} не найдена')
+
+    def find_by_name(self, name):
+        statement = f'SELECT * FROM {self.tablename} WHERE name=?'
+        self.cursor.execute(statement, (name,))
+        result = self.cursor.fetchone()
+        if result:
+            _id, _name, category_id, desc, img = result
+            category = Category(_name, category_id)
+            category.id = _id
+            category.desc = desc
+            category.img = img
+            return category
+        else:
+            raise RecordNotFoundException(f'Запись с именем = {name} не найдена')
+
+    def insert(self, obj):
+        statement = f'INSERT INTO {self.tablename} (name, category_id, desc, img) ' \
+                    f'VALUES (?, ?, ?, ?)'
+        self.cursor.execute(statement, (obj.name, obj.category_id, obj.desc, obj.img))
+        try:
+            self.connection.commit()
+        except Exception as err:
+            raise DbCommitException(err.args)
+
+    def update(self, obj):
+        statement = f"UPDATE {self.tablename} SET name=?, category_id=?,desc=?, img=? WHERE id=?"
+        self.cursor.execute(statement, (obj.name, obj.category_id, obj.desc, obj.img, obj.id))
+        try:
+            self.connection.commit()
+        except Exception as err:
+            raise DbUpdateException(err.args)
+
+    def delete(self, obj):
+        statement = f'DELETE FROM {self.tablename} WHERE id=?'
+        self.cursor.execute(statement, (obj.id,))
+
+
 class MapperRegistry:
     mappers = {
         'products': ProductsMapper,
+        'category': CategoryMapper
     }
 
     @staticmethod

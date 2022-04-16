@@ -1,0 +1,57 @@
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': []}
+log---> Создана категория Хранение
+log---> Создана категория Сад
+log---> Создана категория Текстиль
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': []}
+log---> Создана категория Хранение
+log---> Создана категория Сад
+log---> Создана категория Текстиль
+log---> Создан продукт Полка для обуви, металл, дерево, 3 секции, 76х31х49 см, с сиденьем, орех, бежевая, Sheffilton
+log---> Создан продукт Вешалка напольная Sheffilton M-3026 В1-60, венге/черный
+log---> Создан продукт Качели садовые Кокон, 150 кг, Green Days, серые, ротанг, подушка малиновая
+log---> Создан продукт Постельное белье евростандарт, простыня 220х240 см, 2 наволочки 50х70 см, пододеяльник 200х220 см
+log---> Создан продукт Плед 1.5-спальный, 150х180 см
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7fb14e0c9970>, <patterns.pattern_creator.RealProduct object at 0x7fb14e0c99d0>, <patterns.pattern_creator.RealProduct object at 0x7fb14e0c9e20>]}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7f2599b58ca0>, <patterns.pattern_creator.RealProduct object at 0x7f2599b58be0>, <patterns.pattern_creator.RealProduct object at 0x7f2599b58c70>]}
+log---> Создана категория Хранение
+log---> Создана категория Сад
+log---> Создана категория Текстиль
+log---> Создан продукт Storehouse
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': []}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': []}
+log---> Создана категория Хранение
+log---> Создана категория Сад
+log---> Создана категория Текстиль
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': []}
+log---> Создана категория Хранение
+log---> Создана категория Сад
+log---> Создана категория Текстиль
+log---> Создан продукт Полка для обуви, металл, дерево, 3 секции, 76х31х49 см, с сиденьем, орех, бежевая, Sheffilton
+log---> Создан продукт Вешалка напольная Sheffilton M-3026 В1-60, венге/черный
+log---> Создан продукт Качели садовые Кокон, 150 кг, Green Days, серые, ротанг, подушка малиновая
+log---> Создан продукт Постельное белье евростандарт, простыня 220х240 см, 2 наволочки 50х70 см, пододеяльник 200х220 см
+log---> Создан продукт Плед 1.5-спальный, 150х180 см
+log---> Создан продукт Плед
+log---> Создана категория new
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7fa7be2ffa60>, <patterns.pattern_creator.RealProduct object at 0x7fa7be2ff1c0>, <patterns.pattern_creator.RealProduct object at 0x7fa7be2ff910>]}
+log---> Создана категория super new
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7fa7be2b4130>, <patterns.pattern_creator.RealProduct object at 0x7fa7be2b4eb0>, <patterns.pattern_creator.RealProduct object at 0x7fa7be2b47c0>]}
+log---> Создан пользователь Сергей
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Сергей', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7fa7be31afa0>, <patterns.pattern_creator.RealProduct object at 0x7fa7be31a400>, <patterns.pattern_creator.RealProduct object at 0x7fa7be31ae50>]}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Сергей', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7fa7be31a820>, <patterns.pattern_creator.RealProduct object at 0x7fa7be31a9d0>, <patterns.pattern_creator.RealProduct object at 0x7fa7be360340>]}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Сергей', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7fa7be2daf70>, <patterns.pattern_creator.RealProduct object at 0x7fa7be2dab50>, <patterns.pattern_creator.RealProduct object at 0x7fa7be2daaf0>]}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7f51f94d4cd0>, <patterns.pattern_creator.RealProduct object at 0x7f51f94d4d60>, <patterns.pattern_creator.RealProduct object at 0x7f51f94d4d30>]}
+log---> Создан пользователь Сергей
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Сергей', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7f51f948d1f0>, <patterns.pattern_creator.RealProduct object at 0x7f51f948d9d0>, <patterns.pattern_creator.RealProduct object at 0x7f51f948d580>]}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Сергей', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7f51f944cd00>, <patterns.pattern_creator.RealProduct object at 0x7f51f944c7f0>, <patterns.pattern_creator.RealProduct object at 0x7f51f944c0a0>]}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': []}
+log---> Создана категория Хранение
+log---> Создана категория Сад
+log---> Создана категория Текстиль
+log---> Создан продукт Полка для обуви, металл, дерево, 3 секции, 76х31х49 см, с сиденьем, орех, бежевая, Sheffilton
+log---> Создан продукт Вешалка напольная Sheffilton M-3026 В1-60, венге/черный
+log---> Создан продукт Качели садовые Кокон, 150 кг, Green Days, серые, ротанг, подушка малиновая
+log---> Создан продукт Постельное белье евростандарт, простыня 220х240 см, 2 наволочки 50х70 см, пододеяльник 200х220 см
+log---> Создан продукт Плед 1.5-спальный, 150х180 см
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7f9e7f48be50>, <patterns.pattern_creator.RealProduct object at 0x7f9e7f48b790>, <patterns.pattern_creator.RealProduct object at 0x7f9e7f48b910>]}
+log---> Сформирована главная страница с контекстом: {'title': 'Главная', 'year': 2022, 'path': '/', 'user': 'Анонимный', 'product_list': [<patterns.pattern_creator.RealProduct object at 0x7f87129b7d90>, <patterns.pattern_creator.RealProduct object at 0x7f87129b7cd0>, <patterns.pattern_creator.RealProduct object at 0x7f87129b7d60>]}
